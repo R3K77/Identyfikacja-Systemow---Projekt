@@ -15,7 +15,7 @@ Sampling: 0.08s
 Number:
 	1000
 Inputs:
-	u: voltage of the heating device (wg ksi¹¿ki L. Ljung'a jest to moc grzania wyra¿ona w [W])
+	u: voltage of the heating device (wg ksiÄ…Å¼ki L. Ljung'a jest to moc grzania wyraÅ¼ona w [W])
 Outputs:
 	y: output air temperature 
 References:

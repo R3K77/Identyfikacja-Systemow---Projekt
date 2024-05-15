@@ -46,6 +46,7 @@ data_test = iddata(y_test, u_test, sampling_time);
 
 
 %% Określenie opóźnienia wejścia
+figure;
 
 FIRModel = impulseest(data);
 clf
@@ -65,7 +66,7 @@ setoptions(h, 'ConfidenceRegionNumber', 3);
 V = arxstruc(data, data_test, struc(1:10, 1:10, 3)); % 3 - liczba próbek odchylenia standardowego
 
 % Wybór najlepszego modelu
-% nn = selstruc(V, 0)
+nn = selstruc(V, 0)
 
 % nn = 10, 4, 3 - najlepsze dopasowanie
 % nn = 4, 4, 3 - najlepsze dopasowanie dla metody najmniejszych kwadratów
@@ -76,18 +77,18 @@ V = arxstruc(data, data_test, struc(1:10, 1:10, 3)); % 3 - liczba próbek odchyl
 %% Sprawdzenie biegunów i zer modelu
 
 th4 = arx(data, [4 4 3]);
-% figure; % odkomentować
-% h = iopzplot(th4); % odkomentować
-% setoptions(h, 'ConfidenceRegionNumber', 3); % odkomentować
+figure; % odkomentować
+h = iopzplot(th4); % odkomentować
+setoptions(h, 'ConfidenceRegionNumber', 3); % odkomentować
 % Analizując wykres można zauważyć, że obszar ufności dwóch sprzężonych biegunów i zer nakłada się na siebie, 
 % co ozancza, że prawdopodobnie się zniosą.
 % Dlatego wybieramy model rzędu 2, 2, 3.
 
 % Sprawdzenie biegunów i zer modelu rzędu 2, 2, 3. 
 th2 = arx(data, [2 2 3]);
-% figure; % odkomentować
-% h = iopzplot(th2); % odkomentować
-% setoptions(h, 'ConfidenceRegionNumber', 3); % odkomentować
+figure; % odkomentować
+h = iopzplot(th2); % odkomentować
+setoptions(h, 'ConfidenceRegionNumber', 3); % odkomentować
 
 %% Sprawdzenie jakości modelu
 % Sprawdzamy przy użyciu funkcji compare, jak oba modele radzą sobie z
