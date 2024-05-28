@@ -2,7 +2,7 @@ clc; clear; clear all
 
 % Load data from dryer.dat
 data = load('Dane/dryer.dat');
-sampling_time = 0.8;
+sampling_time = 0.08; %sampling time powinnien być 0.08s
 time = (0:size(data, 1)-1) * sampling_time;
 
 % Załadowanie do zmiennych:
@@ -13,17 +13,18 @@ all_data = iddata(output_y, input_u, sampling_time);
 
 %% Obrazowanie danych
 % 
-% subplot(2,1,1);
-% plot(time, input_u);
-% xlabel('Time');
-% ylabel('Input Power [W]');
-% title('Input Power vs Time');
-% 
-% subplot(2,1,2);
-% plot(time, output_y);
-% xlabel('Time');
-% ylabel('Temperature [C]');
-% title('Temperature vs Time');
+figure(1);
+plot(time, input_u,'Color',"#D95319");
+xlabel('Time [s]');
+ylabel('Input Power [W]');
+grid on;
+
+figure(2);
+plot(time, output_y);
+xlabel('Time [s]');
+ylabel('Temperature [C]');
+grid on;
+
 
 %% Podzielenie danych na zbiory uczący i testowy
 u_train = input_u(1:length(input_u)/2);
@@ -57,6 +58,8 @@ setoptions(h, 'ConfidenceRegionNumber', 3);
 % jest większa od obszaru ufności (confidence region)
 % Obszar ufności wynosi trzy wartości odchylenia standardowego.
 % W naszym przypadku opóźnienie wynosi 2.4 [s] (trzy próbki).
+% Odnośnie tego czasu to chyba trzy próbki to 0.24s, a nie 2.4s.
+%bo Tp = 0.08s, a nie 0.8s.
 
 
 %% Określenie stopnia modelu
@@ -97,4 +100,4 @@ figure;
 compare(data_test, th4, th2);
 
 % Możemy odczytać, że zmniejszając rząd modelu (z 4, 4, 3 na 2, 2, 3) nie pogorszyliśmy znacząco jakości modelu.
-
+print('-f1','\Zrzuty ekranu\1_input','-dpdf','-bestfit')
