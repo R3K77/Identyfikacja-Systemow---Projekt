@@ -39,25 +39,6 @@ y_test = y(floor(length(y)/2)+1:end);
 data_train = iddata(y_train, u_train, Tp);
 data_test = iddata(y_test, u_test, Tp);
 
-%% Analiza korelacyjna
-M = 100; % Długość okna
-Ruu = Covar([u u], 0);   % Estymacja wariancji sygnału u
-g_Mb = zeros(M, 1);
-for i = 1:M
-    Ryu = Covar([y u], (i-1));  % Estymacja funkcji autokorelacji
-    g_Mb(i) = Ryu / Ruu;          % Wyznaczenie M próbek odpowiedzi impulsowej
-end
-
-% Wyświetlenie wyników analizy korelacyjnej (odpowiedzi impulsowej)
-fig = figure;
-fig.Theme = "light";
-
-plot((0:M-1)*Tp, g_Mb);
-xlabel('$nTp [s]$', Interpreter='latex');
-ylabel('$g_{Mb}$', Interpreter='latex');
-grid on;
-% title('Impulse Response Estimate');
-
 %% Analiza widmowa
 
 TF = 2.5*Tp/(2*pi)
@@ -146,16 +127,20 @@ subplot(2,1,1);
 semilogx(omega2m, LmETFE(1:indm), 'r', 'LineWidth', 1);
 hold on;
 semilogx(omega2, LmhatGs(1:ind), 'b', 'LineWidth', 1);
-xlabel('Czestotliwosc [rad/s]' , Interpreter='Latex');
-ylabel('Magnituda [dB]' , Interpreter='Latex');
+xlabel('Frequency [rad/s]' , Interpreter='Latex');
+ylabel('Magnitude [dB]' , Interpreter='Latex');
 grid on;
-title('Bode Magnitude Estimate');
+set(gca, 'TickLabelInterpreter', 'latex');
+
+% title('Bode Magnitude Estimate');
 legend('ETFE', 'Smoothed ETFE', Interpreter='Latex');
 subplot(2,1,2);
 semilogx(omega2m, ArgETFE(1:indm), 'r', 'LineWidth', 1);
 hold on;
+grid on;
 semilogx(omega2, ArghatGs(1:ind), 'b', 'LineWidth', 1);
-xlabel('Frequency [rad/s]');
-ylabel('Phase [deg]');
-title('Bode Phase Estimate, chyba bez sensu to wklejac do sprawka');
-legend('ETFE', 'Smoothed ETFE');
+xlabel('Frequency [rad/s]' , Interpreter='Latex');
+ylabel('Phase [deg]' , Interpreter='Latex');
+% title('Bode Phase Estimate, chyba bez sensu to wklejac do sprawka');
+legend('ETFE', 'Smoothed ETFE', Interpreter='Latex');
+set(gca, 'TickLabelInterpreter', 'latex');

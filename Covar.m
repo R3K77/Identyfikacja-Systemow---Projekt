@@ -15,6 +15,6 @@ else
     Yp((1-tau):N) = Yd(1:(N+tau));
 end
 
-% CYU = (1/N)*(Ud'*Yp);
-CYU = (1/(N-abs(tau)))*(Ud'*Yp); % Estymator nieobciążony funkcji korelacji
+CYU = (1/N)*(Ud'*Yp);
+% CYU = (1/(N-abs(tau)))*(Ud'*Yp); % Estymator nieobciążony funkcji korelacji
 C = CYU;
