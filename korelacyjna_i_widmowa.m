@@ -2,7 +2,7 @@ clc; clear; clear all;
 
 % Wczytanie danych z pliku dryer.dat
 data = load('Dane/dryer.dat');
-Tp = 0.8;
+Tp = 0.08;
 time = (0:size(data, 1)-1) * Tp;
 
 % Załadowanie do zmiennych:
@@ -49,11 +49,14 @@ for i = 1:M
 end
 
 % Wyświetlenie wyników analizy korelacyjnej (odpowiedzi impulsowej)
-figure;
+fig = figure;
+fig.Theme = "light";
+
 plot((0:M-1)*Tp, g_Mb);
-xlabel('nTp [s]');
-ylabel('g_Mb');
-title('Impulse Response Estimate');
+xlabel('$nTp [s]$', Interpreter='latex');
+ylabel('$g_{Mb}$', Interpreter='latex');
+grid on;
+% title('Impulse Response Estimate');
 
 %% Analiza widmowa
 
@@ -137,19 +140,21 @@ omega2 = omega(1:ind);       % wektor pulsacji z połowy zakresu (do wykresów)
 
 
 % Wyświetlenie wyników analizy widmowej - charakterystyki Bodego
-figure;
+fig2 = figure;
+fig2.Theme = "light";
 subplot(2,1,1);
-semilogx(omega2m, LmETFE(1:indm), 'r', 'LineWidth', 2);
+semilogx(omega2m, LmETFE(1:indm), 'r', 'LineWidth', 1);
 hold on;
-semilogx(omega2, LmhatGs(1:ind), 'b', 'LineWidth', 2);
-xlabel('Frequency [rad/s]');
-ylabel('Magnitude [dB]');
+semilogx(omega2, LmhatGs(1:ind), 'b', 'LineWidth', 1);
+xlabel('Czestotliwosc [rad/s]' , Interpreter='Latex');
+ylabel('Magnituda [dB]' , Interpreter='Latex');
+grid on;
 title('Bode Magnitude Estimate');
-legend('ETFE', 'Smoothed ETFE');
+legend('ETFE', 'Smoothed ETFE', Interpreter='Latex');
 subplot(2,1,2);
-semilogx(omega2m, ArgETFE(1:indm), 'r', 'LineWidth', 2);
+semilogx(omega2m, ArgETFE(1:indm), 'r', 'LineWidth', 1);
 hold on;
-semilogx(omega2, ArghatGs(1:ind), 'b', 'LineWidth', 2);
+semilogx(omega2, ArghatGs(1:ind), 'b', 'LineWidth', 1);
 xlabel('Frequency [rad/s]');
 ylabel('Phase [deg]');
 title('Bode Phase Estimate, chyba bez sensu to wklejac do sprawka');
