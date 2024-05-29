@@ -18,8 +18,8 @@ output_test = output_data(split_idx+1:end);
 
 % Parametry
 N_train = length(input_train); % liczba próbek w zestawie treningowym
-na = 2; % rząd modelu ARX dla wyjścia
-nb = 2; % rząd modelu ARX dla wejścia
+na = 1; % rząd modelu ARX dla wyjścia
+nb = 1; % rząd modelu ARX dla wejścia
 nk = 3; % opóźnienie (number of samples)
 
 % Inicjalizacja zmiennych

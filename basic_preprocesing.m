@@ -11,22 +11,24 @@ output_y = data(:,2);   % Temperatura wyrażona w [C]
 
 all_data = iddata(output_y, input_u, sampling_time);
 
-%% Obrazowanie danych
-% 
-% figure(1);
-% plot(time, input_u,'Color',"#D95319");
-% xlabel('Time [s]');
-% ylabel('Input Power [W]');
-% grid on;
+% Obrazowanie danych
 
-% figure(2);
-% plot(time, output_y);
-% xlabel('Time [s]');
-% ylabel('Temperature [C]');
-% grid on;
+figure(1);
+plot(time, input_u,'Color',"#D95319");
+xlabel('Time [$nT_p$]', 'Interpreter', 'latex');
+ylabel('Input Power [W]');
+set(gca,'TickLabelInterpreter','latex');
+grid on;
+
+figure(2);
+plot(time, output_y);
+xlabel('Time [$nT_p$]', 'Interpreter', 'latex');
+ylabel('Output [V]', 'Interpreter', 'latex');
+set(gca,'TickLabelInterpreter','latex');
+grid on;
+
 
 figure(3);
-
 % Subplot 1
 ax1 = subplot(2,1,1);
 stem(time, input_u, 'DisplayName', 'Input Power', 'Color', '#D95319'); % Dodanie nazwy dla legendy i zmiana koloru na orange
