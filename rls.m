@@ -96,6 +96,13 @@ disp(theta);
 
 disp(['Jfit (Prediction): ', num2str(Jfit_pred)]);
 disp(['Jfit (System Response): ', num2str(Jfit_sys)]);
+% Obliczenie błędu średniokwadratowego (MSE) dla predyktora
+mse_pred = mean((y_true - y_pred).^2);
+disp(['Błąd średniokwadratowy (MSE) dla predyktora: ', num2str(mse_pred)]);
+
+% Obliczenie błędu średniokwadratowego (MSE) dla modelu symulacyjnego
+mse_sys = mean((output_data - Y_m).^2);
+disp(['Błąd średniokwadratowy (MSE) dla modelu symulacyjnego: ', num2str(mse_sys)]);
 
 % Dodanie funkcjonalności porównania odpowiedzi skokowych
 

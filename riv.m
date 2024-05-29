@@ -18,8 +18,8 @@ output_test = output_data(split_idx+1:end);
 
 % Parametry
 N_train = length(input_train); % liczba próbek w zestawie treningowym
-na = 1; % rząd modelu ARX dla wyjścia
-nb = 1; % rząd modelu ARX dla wejścia
+na = 2; % rząd modelu ARX dla wyjścia
+nb = 2; % rząd modelu ARX dla wejścia
 nk = 3; % opóźnienie (number of samples)
 
 % Inicjalizacja zmiennych
@@ -120,6 +120,10 @@ disp(theta_IV);
 
 disp(['Jfit (Prediction): ', num2str(Jfit_pred)]);
 disp(['Jfit (System Response): ', num2str(Jfit_sys)]);
+mse_pred = mean((y_true - y_pred).^2);
+disp(['Błąd średniokwadratowy (MSE) dla predyktora: ', num2str(mse_pred)]);
+mse_sym = mean((output_test - Y_m).^2);
+disp(['Błąd średniokwadratowy (MSE) dla modelu sym: ', num2str(mse_sym)]);
 
 % Obliczanie transmitancji końcowej
 A = [1; theta_IV(1:na)];
