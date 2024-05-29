@@ -48,53 +48,46 @@ disp(a');
 disp('Współczynniki b:');
 disp(b');
 
-% Symulacja odpowiedzi modelu ARX dla danych testowych
-N_test = length(input_test);
-Y_pred = zeros(N_test, 1);
+% Obliczenie transmitancji na podstawie parametrów ARX
+b_trans = [zeros(1, nk), b'];
+a_trans = [1, a'];
 
-for i = max(na, nb+nk-1)+1:N_test
-    % Obliczanie wyjścia modelu ARX
-    Y_pred(i) = -a' * output_test(i-1:-1:i-na) + b' * input_test(i-nk:-1:i-nk-nb+1);
-end
+sys = tf(b_trans, a_trans, Tp, 'Variable', 'z^-1');
+
+% Symulacja odpowiedzi modelu ARX dla danych testowych
+Y_pred = lsim(sys, input_test, time(split_idx+1:end));
 
 % Obliczenie błędu średniokwadratowego (MSE) dla danych testowych
-mse = mean((output_test(max(na, nb+nk-1)+1:end) - Y_pred(max(na, nb+nk-1)+1:end)).^2);
+mse = mean((output_test - Y_pred).^2);
 disp(['Błąd średniokwadratowy (MSE) na danych testowych: ', num2str(mse)]);
+
+% Obliczenie wskaźnika dopasowania (Jfit)
+Jfit = 100 * (1 - sum((output_test - Y_pred).^2) / sum((output_test - mean(output_test)).^2));
+disp(['Wskaźnik dopasowania (J_{fit}): ', num2str(Jfit), '%']);
 
 % Wykresy
 figure;
 subplot(2,1,1);
-plot(time(split_idx+1:end), output_test, 'b', 'DisplayName', 'Pomiary rzeczywiste');
+plot(time(split_idx+1:end), output_test, 'b');
 hold on;
-plot(time(split_idx+1:end), Y_pred, 'r', 'DisplayName', 'Predykcja modelu ARX');
-legend;
-xlabel('Czas [s]');
-ylabel('Temperatura [C]');
-title('Porównanie pomiarów rzeczywistych z predykcją modelu ARX');
+plot(time(split_idx+1:end), Y_pred, 'r');
+legend('$y$', '$y_m$', 'Interpreter', 'latex');
+xlabel('Time [$nT_p$]', 'Interpreter', 'latex');
+set(gca,'TickLabelInterpreter','latex');
+% ylabel('Temperatura [C]');
+% title('Porównanie pomiarów rzeczywistych z predykcją modelu ARX');
 grid on;
 
 subplot(2,1,2);
 plot(time, input_data, 'k');
-xlabel('Czas [s]');
-ylabel('Moc grzałki [W]');
-title('Sygnał wejściowy');
+xlabel('Time [$nT_p$]', 'Interpreter', 'latex');
+ylabel('Power [W]', 'Interpreter', 'latex');
+set(gca,'TickLabelInterpreter','latex');
+% title('Sygnał wejściowy');
 grid on;
 
-% Symulacja odpowiedzi skokowej modelu ARX
-step_input = [zeros(nk-1, 1); ones(N_test, 1)];
-step_response = zeros(N_test + nk - 1, 1);
-
-for i = max(na, nb+nk-1)+1:N_test+nk-1
-    step_response(i) = -a' * step_response(i-1:-1:i-na) + b' * step_input(i-nk:-1:i-nk-nb+1);
-end
-
-% Symulacja odpowiedzi impulsowej modelu ARX
-impulse_input = [zeros(nk-1, 1); 1; zeros(N_test-1, 1)];
-impulse_response = zeros(N_test + nk - 1, 1);
-
-for i = max(na, nb+nk-1)+1:N_test+nk-1
-    impulse_response(i) = -a' * impulse_response(i-1:-1:i-na) + b' * impulse_input(i-nk:-1:i-nk-nb+1);
-end
+% Generowanie odpowiedzi skokowej
+[step_response, step_time] = step(sys, 0:Tp:7.5);
 
 % Obliczenia rzeczywistej odpowiedzi impulsowej i skokowej za pomocą analizy korelacyjnej
 M = 100; % liczba próbek odpowiedzi impulsowej do estymacji
@@ -112,25 +105,13 @@ h_hat_M = Tp * cumsum(g_hat_M);
 
 % Tworzenie wykresu odpowiedzi skokowej
 figure;
-subplot(2,1,1);
-plot((0:length(step_response)-1)*Tp, step_response, 'b', 'DisplayName', 'Model ARX');
+plot(step_time, step_response, 'b');
 hold on;
-plot((1:M-1)*Tp, h_hat_M(2:end), 'r', 'DisplayName', 'Rzeczywista');
-legend;
-xlabel('Czas [s]');
-ylabel('Odpowiedź skokowa');
-title('Porównanie odpowiedzi skokowej');
-xlim([0, 7.5])
-grid on;
-
-% Tworzenie wykresu odpowiedzi impulsowej
-subplot(2,1,2);
-plot((0:length(impulse_response)-1)*Tp, impulse_response, 'b', 'DisplayName', 'Model ARX');
-hold on;
-plot((1:M-1)*Tp, g_hat_M(2:end), 'r', 'DisplayName', 'Rzeczywista');
-legend;
-xlabel('Czas [s]');
-ylabel('Odpowiedź impulsowa');
-title('Porównanie odpowiedzi impulsowej');
-xlim([0, 7.5])
+plot((1:M-1)*Tp, h_hat_M(2:end), 'r');
+legend('$h_m$', '$h$', 'Interpreter', 'latex');
+xlabel('Time [$s$]', 'Interpreter', 'latex');
+set(gca,'TickLabelInterpreter','latex');
+% ylabel('h', 'Interpreter', 'latex');
+% title('Porównanie odpowiedzi skokowej');
+xlim([0 7.5]);
 grid on;
