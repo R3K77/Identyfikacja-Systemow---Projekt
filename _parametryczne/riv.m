@@ -1,7 +1,7 @@
 clc; clear; clear all;
 
 % Wczytanie danych z pliku dryer.dat
-data = load('Dane/dryer.dat');
+data = load('../Dane/dryer.dat');
 Tp = 0.08;
 time = (0:size(data, 1)-1) * Tp;
 
@@ -75,6 +75,7 @@ for n = max(na, nb+nk):N_test
 end
 
 % Obliczanie Jfit
+% tutaj predktor sobie dobrze radzi wiec nie ma co go ucinac z uzyciem numSkipedSamples
 y_true = output_test(max(na, nb+nk):N_test);
 Jfit_pred = 100 * (1 - sum((y_true - y_pred).^2) / sum((y_true - mean(y_true)).^2));
 
@@ -99,15 +100,20 @@ sys = tf(b, a, Tp, 'Variable', 'z^-1');
 % Symulacja odpowiedzi modelu ARX dla danych testowych
 Y_m = lsim(sys, input_test, time(split_idx+1:end));
 
+% Ze względu na obliczanie wskaźników jakości modelu  na podstawie porówywania do odpowiedzi na nie zerowe warunki początkowe 
+% naley pominać x próbek w celu wyeliminiowania tego błędu i normalizacji wyników
+numSkipedSamples = 30;
+
 % Obliczanie Jfit dla odpowiedzi modelu
-Jfit_sys = 100 * (1 - sum((output_test - Y_m).^2) / sum((output_test - mean(output_test)).^2));
+Jfit_sys = 100 * (1 - sum((output_test(numSkipedSamples:end)  - Y_m(numSkipedSamples:end) ).^2) / sum((output_test(numSkipedSamples:end)  - mean(output_test(numSkipedSamples:end) )).^2));
 
 
 % Tworzenie wykresu rzeczywistych i predykowanych wartości wyjściowych
 figure;
 plot(max(na, nb+nk):N_test, y_true, 'b', max(na, nb+nk):N_test, y_pred, 'r--');
 hold on;
-plot((time(split_idx+1:end)-time(split_idx))/Tp, Y_m, '-.');
+plot((time(split_idx+numSkipedSamples:end)-time(split_idx))/Tp, Y_m(numSkipedSamples:end), '-.');
+plot((time(split_idx:split_idx+numSkipedSamples-1)-time(split_idx))/Tp, Y_m(1:numSkipedSamples) , '-.k');
 % title('True vs Predicted Output');
 xlabel('Sample [n]', 'Interpreter', 'latex');
 set(gca,'TickLabelInterpreter','latex');
@@ -122,8 +128,8 @@ disp(['Jfit (Prediction): ', num2str(Jfit_pred)]);
 disp(['Jfit (System Response): ', num2str(Jfit_sys)]);
 mse_pred = mean((y_true - y_pred).^2);
 disp(['Błąd średniokwadratowy (MSE) dla predyktora: ', num2str(mse_pred)]);
-mse_sym = mean((output_test - Y_m).^2);
-disp(['Błąd średniokwadratowy (MSE) dla modelu sym: ', num2str(mse_sym)]);
+mse_sys = mean((output_test(numSkipedSamples:end) - Y_m(numSkipedSamples:end) ).^2);
+disp(['Błąd średniokwadratowy (MSE) dla modelu sym: ', num2str(mse_sys)]);
 
 % Obliczanie transmitancji końcowej
 A = [1; theta_IV(1:na)];

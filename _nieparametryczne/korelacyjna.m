@@ -1,7 +1,7 @@
 clc; clear; clear all;
 
 % Wczytanie danych z pliku dryer.dat
-data = load('Dane/dryer.dat');
+data = load('../Dane/dryer.dat');
 Tp = 0.08;
 time = (0:size(data, 1)-1) * Tp;
 

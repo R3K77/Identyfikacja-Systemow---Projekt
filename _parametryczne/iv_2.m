@@ -1,9 +1,9 @@
 clc; clear; clear all;
 
 % Wczytanie danych z pliku dryer.dat
-data = load('Dane/dryer.dat');
+data = load('../Dane/dryer.dat');
 Tp = 0.08;
-time = (0:size(data, 1)-1) * Tp
+time = (0:size(data, 1)-1) * Tp;
 
 % Załadowanie do zmiennych:
 input_data = data(:,1);    % Moc grzałki wyrażona w [W]
@@ -69,12 +69,16 @@ sys = tf(b, a, Tp, 'Variable', 'z^-1');
 % Symulacja odpowiedzi modelu ARX dla danych testowych
 Y_pred = lsim(sys, input_test, time(split_idx+1:end));
 
+% Ze względu na obliczanie wskaźników jakości modelu  na podstawie porówywania do odpowiedzi na nie zerowe warunki początkowe 
+% naley pominać x próbek w celu wyeliminiowania tego błędu i normalizacji wyników
+numSkipedSamples = 30;
+
 % Obliczenie błędu średniokwadratowego (MSE) dla danych testowych
-mse = mean((output_test - Y_pred).^2);
+mse = mean((output_test(numSkipedSamples:end) - Y_pred(numSkipedSamples:end) ).^2);
 disp(['Błąd średniokwadratowy (MSE) na danych testowych: ', num2str(mse)]);
 
 % Obliczenie wskaźnika dopasowania (Jfit)
-Jfit = 100 * (1 - sum((output_test - Y_pred).^2) / sum((output_test - mean(output_test)).^2));
+Jfit = 100 * (1 - sum((output_test(numSkipedSamples:end)  - Y_pred(numSkipedSamples:end) ).^2) / sum((output_test(numSkipedSamples:end)  - mean(output_test(numSkipedSamples:end) )).^2));
 disp(['Wskaźnik dopasowania (J_{fit}): ', num2str(Jfit), '%']);
 
 % Generowanie odpowiedzi skokowej
@@ -115,9 +119,11 @@ fig2 = figure;
 fig2.Theme = "light";
 
 subplot(2,1,1);
-plot(time(split_idx+1:end), output_test, 'b');
+plot(time(split_idx+numSkipedSamples:end), output_test(numSkipedSamples:end) , 'b');
 hold on;
-plot(time(split_idx+1:end), Y_pred, 'r');
+plot(time(split_idx+numSkipedSamples:end), Y_pred(numSkipedSamples:end) , 'r');
+plot(time(split_idx:split_idx+numSkipedSamples-1), output_test(1:numSkipedSamples) , 'k');
+plot(time(split_idx:split_idx+numSkipedSamples-1), Y_pred(1:numSkipedSamples) , 'k');
 legend('$y$', '$y_m$', 'Interpreter', 'latex');
 xlabel('Time [s]', 'Interpreter', 'Latex');
 % ylabel('Temperatura [C]', 'Interpreter', 'Latex');

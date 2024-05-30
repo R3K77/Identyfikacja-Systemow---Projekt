@@ -1,7 +1,7 @@
 clc; clear; clear all;
 
 % Wczytanie danych z pliku dryer.dat
-data = load('Dane/dryer.dat');
+data = load('../Dane/dryer.dat');
 Tp = 0.08;
 time = (0:size(data, 1)-1) * Tp;
 
@@ -76,14 +76,19 @@ sys = tf(b, a, Tp, 'Variable', 'z^-1');
 % Symulacja odpowiedzi modelu ARX dla danych testowych
 Y_m = lsim(sys, input_data, time);
 
+% Ze względu na obliczanie wskaźników jakości modelu  na podstawie porówywania do odpowiedzi na nie zerowe warunki początkowe 
+% naley pominać x próbek w celu wyeliminiowania tego błędu i normalizacji wyników
+numSkipedSamples = 30;
+
 % Obliczanie Jfit dla odpowiedzi modelu
-Jfit_sys = 100 * (1 - sum((output_data - Y_m).^2) / sum((output_data - mean(output_data)).^2));
+Jfit_sys = 100 * (1 - sum((output_data(numSkipedSamples:end)  - Y_m(numSkipedSamples:end) ).^2) / sum((output_data(numSkipedSamples:end)  - mean(output_data(numSkipedSamples:end) )).^2));
 
 % Tworzenie wykresu rzeczywistych i predykowanych wartości wyjściowych
 figure;
 plot(max(na, nb+nk):N, y_true, 'b', max(na, nb+nk):N, y_pred, 'r--');
 hold on;
-plot(time/Tp, Y_m, '-.');
+plot((time(numSkipedSamples:end))/Tp, Y_m(numSkipedSamples:end), '-.');
+plot((time(1:numSkipedSamples-1))/Tp, Y_m(1:numSkipedSamples-1) , '-.k');
 % title('True vs Predicted Output');
 xlabel('Sample [n]', 'Interpreter', 'latex');
 set(gca,'TickLabelInterpreter','latex');
@@ -101,7 +106,7 @@ mse_pred = mean((y_true - y_pred).^2);
 disp(['Błąd średniokwadratowy (MSE) dla predyktora: ', num2str(mse_pred)]);
 
 % Obliczenie błędu średniokwadratowego (MSE) dla modelu symulacyjnego
-mse_sys = mean((output_data - Y_m).^2);
+mse_sys = mean((output_data(numSkipedSamples:end) - Y_m(numSkipedSamples:end) ).^2);
 disp(['Błąd średniokwadratowy (MSE) dla modelu symulacyjnego: ', num2str(mse_sys)]);
 
 % Dodanie funkcjonalności porównania odpowiedzi skokowych
